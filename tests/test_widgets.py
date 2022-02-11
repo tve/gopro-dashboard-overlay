@@ -202,6 +202,51 @@ def test_composite_viewport():
     })
 
 
+class VerticalRange:
+
+    def __init__(self, at, value):
+        self.at = at
+        self.value = value
+        self.size = Dimension(50, 200)
+        self.half_height = self.size.y / 2
+        self.min = -1
+        self.max = 1
+        self.mid = (self.min + self.max) / 2
+
+    def draw(self, image, draw):
+        value = self.value()
+
+        
+
+        draw.rectangle(
+            [
+                self.at.x + 0, self.at.y + 0,
+                self.at.x + self.size.x, self.at.y + self.size.y
+            ],
+            fill=None,
+            width=2,
+            outline=(255, 255, 255)
+        )
+
+
+def test_range_widget():
+    render_once(
+        Translate(
+            Coordinate(100, 100),
+            Composite(
+                VerticalRange(at=Coordinate(0, 0), value=lambda: 0.5),
+                VerticalRange(at=Coordinate(50, 0), value=lambda: 1.0),
+                VerticalRange(at=Coordinate(100, 0), value=lambda: -0.5),
+                VerticalRange(at=Coordinate(150, 0), value=lambda: -1.0),
+            )
+        )
+    )
+
+
+def render_once(widget):
+    Scene(Dimension(x=600, y=400), [widget]).draw().show()
+
+
 def time_rendering(name, widgets, dimensions: Dimension = Dimension(x=600, y=300), repeat=100):
     timer = PoorTimer(name)
 
