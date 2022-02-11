@@ -177,6 +177,13 @@ class DrawTranslate:
     def text(self, xy, text, **kwargs):
         self.draw.text(xy=(xy[0] + self.at.x, xy[1] + self.at.y), text=text, **kwargs)
 
+    def rectangle(self, xy, **kwargs):
+        self.draw.rectangle(
+            [
+                self.at.x + xy[0], self.at.y + xy[1], self.at.x + xy[2], self.at.y + xy[3]
+            ],
+            **kwargs
+        )
 
 class Translate:
     """Extremely rudimentary translation support!
@@ -198,7 +205,7 @@ class Translate:
 
 class Scene:
 
-    def __init__(self, dimensions: Dimension, widgets, ):
+    def __init__(self, dimensions: Dimension, widgets):
         self._widgets = widgets
         self._dimensions = dimensions
 
