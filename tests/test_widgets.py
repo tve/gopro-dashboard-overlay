@@ -1,8 +1,9 @@
 import itertools
+import math
 import random
 from datetime import timedelta
 
-from PIL import ImageFont
+from PIL import ImageFont, Image, ImageDraw
 
 from gopro_overlay import fake
 from gopro_overlay.dimensions import Dimension
@@ -13,6 +14,7 @@ from gopro_overlay.timing import PoorTimer
 from gopro_overlay.units import units
 from gopro_overlay.widgets import simple_icon, Text, Scene, CachingText, Composite, Translate
 from gopro_overlay.widgets_chart import SimpleChart
+from gopro_overlay.widgets_compass import Compass
 from gopro_overlay.widgets_info import BigMetric, ComparativeEnergy
 from tests.approval import approve_image
 from tests.testenvironment import is_make
@@ -200,6 +202,63 @@ def test_composite_viewport():
             )
         )
     })
+
+
+@approve_image
+def test_compass_med():
+    return time_rendering(
+        name="viewport",
+        dimensions=Dimension(250, 250),
+        widgets={
+            Translate(
+                Coordinate(10, 10),
+                Composite(Compass(
+                    size=200,
+                    reading=lambda: 320,
+                    font=font, ),
+                )
+            )
+        })
+
+
+@approve_image
+def test_compass_small():
+    return time_rendering(
+        name="viewport",
+        dimensions=Dimension(250, 250),
+        widgets={
+            Translate(
+                Coordinate(10, 10),
+                Composite(Compass(
+                    size=100,
+                    reading=lambda: 20,
+                    font=font,
+                    colour=(255, 255, 0),
+                    bg=(0, 255, 255),
+                    fg=(0, 0, 0)
+                ), )
+            )
+        })
+
+
+@approve_image
+def test_compass_big():
+    return time_rendering(
+        name="viewport",
+        dimensions=Dimension(400, 400),
+        widgets={
+            Translate(
+                Coordinate(0, 0),
+                Composite(Compass(size=400,
+                                  reading=lambda: 20,
+                                  font=font.font_variant(size=48),
+                                  colour=(255, 255, 255),
+                                  bg=(0, 255, 255),
+                                  fg=(255, 0, 255)
+                                  ),
+                          )
+            )
+        })
 
 
 def time_rendering(name, widgets, dimensions: Dimension = Dimension(x=600, y=300), repeat=100):
