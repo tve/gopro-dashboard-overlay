@@ -151,5 +151,6 @@ class AirspeedIndicator:
                 arc.locate(self.xa(reading) - 180, (self.size / 2) - 8),
                 arc.locate(self.xa(reading) + 90, (self.size / 2) - 8),
             ],
-            fill=self.fg
+            fill=self.fg,
+            # outline=(0, 0, 0)
         )
