@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 
+import sys
+sys.path.insert(0, sys.path[0]+"/..")
+#print(f"sys path: {sys.path}")
+
 import datetime
 import os
 from datetime import timedelta
