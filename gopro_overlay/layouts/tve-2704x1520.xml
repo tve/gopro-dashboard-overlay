@@ -1,0 +1,26 @@
+<layout>
+    <composite x="200" y="30" name="date_and_time">
+        <component type="datetime" x="0" y="0" format="%Y/%m/%d" size="18" align="right"/>
+        <component type="datetime" x="0" y="24" format="%H:%M:%S.%f" truncate="5" size="38" align="right"/>
+    </composite>
+
+    <composite x="2323" y="30" name="gps_info">
+        <component type="text" x="0" y="0" size="16" align="left">Lat: </component>
+        <component type="text" x="170" y="0" size="16" align="left">Lon: </component>
+        <component type="metric" x="118" y="0" metric="lat" dp="6" size="16" align="right" cache="False"/>
+        <component type="metric" x="314" y="0" metric="lon" dp="6" size="16" align="right" cache="False"/>
+    </composite>
+
+    <composite x="100" y="1300" name="big_mph">
+        <component type="text" x="10" y="0" size="24">MPH</component>
+        <component type="metric" x="0" y="0" metric="speed" units="mph" dp="1" size="160" />
+    </composite>
+
+    <!--composite x="2670" y="1380" name="heartbeat">
+        <component type="text" x="-70" y="0" size="16" align="right">BPM</component>
+        <component type="icon" x="-64" y="0" file="heartbeat.png" size="64"/>
+        <component type="metric" x="-70" y="18" metric="hr" dp="0" size="32" align="right"/>
+    </composite-->
+
+    <component type="journey_map" name="journey_map" x="2288" y="70" size="384" corner_radius="35"/>
+</layout>
