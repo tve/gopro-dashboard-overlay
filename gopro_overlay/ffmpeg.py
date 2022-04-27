@@ -11,6 +11,7 @@ from gopro_overlay.dimensions import dimension_from, Dimension
 
 
 def run(cmd, **kwargs):
+    print("Running: " + " ".join(cmd))
     return subprocess.run(cmd, check=True, **kwargs)
 
 
@@ -59,7 +60,7 @@ def join_files(filepaths, output):
             for path in filepaths:
                 f.write(f"file '{path}\n")
 
-        args = ["ffmpeg",
+        args = ["ffmpeg", "-hide_banner",
                 "-y",
                 "-f", "concat",
                 "-safe", "0",
@@ -74,11 +75,14 @@ def join_files(filepaths, output):
 
 
 def find_streams(filepath, invoke=invoke):
+    print(f"ffprobe --hide_banner {filepath}")
     ffprobe_output = str(invoke(["ffprobe", "-hide_banner", filepath]).stderr)
 
-    video_re = re.compile(r"Stream #\d+:(\d+)\(.+\): Video.*, (\d+x\d+)")
-    audio_re = re.compile(r"Stream #\d+:(\d+)\(.+\): Audio")
-    meta_re = re.compile(r"Stream #\d+:(\d+)\(.+\): Data: bin_data \(gpmd")
+    # Stream #0:0[0x1](eng): Video: h264 (High) (avc1 / 0x31637661), yuvj420p(pc, bt709, progressive), 2704x1520 [SAR 1:1 DAR 169:95], 60003 kb/s, 59.94 fps, 59.94 tbr, 60k tbn (default)
+
+    video_re = re.compile(r"Stream #\d+:(\d+)[^:]*: Video.*, (\d+x\d+)")
+    audio_re = re.compile(r"Stream #\d+:(\d+)[^:]*: Audio")
+    meta_re = re.compile(r"Stream #\d+:(\d+)[^:]*: Data: bin_data \(gpmd")
 
     video_stream = None
     video_dimension = None
@@ -97,6 +101,8 @@ def find_streams(filepath, invoke=invoke):
         if meta_match:
             meta_stream = int(meta_match.group(1))
 
+    print(f"video: {video_stream} audio: {audio_stream} meta: {meta_stream} video_dimension: {video_dimension}")
+
     if video_stream is None or audio_stream is None or meta_stream is None or video_dimension is None:
         raise IOError("Invalid File? The data stream doesn't seem to contain GoPro audio, video & metadata ")
 
@@ -107,7 +113,7 @@ def load_gpmd_from(filepath):
     track = find_streams(filepath).meta
     if track:
         cmd = ["ffmpeg", '-y', '-i', filepath, '-codec', 'copy', '-map', '0:%d' % track, '-f', 'rawvideo', "-"]
-        result = run(cmd, capture_output=True, timeout=10)
+        result = run(cmd, capture_output=True, timeout=60)
         if result.returncode != 0:
             raise IOError(f"ffmpeg failed code: {result.returncode} : {result.stderr.decode('utf-8')}")
         arr = array("b")
