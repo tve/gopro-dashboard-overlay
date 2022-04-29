@@ -463,6 +463,26 @@ def gps_filters(report, dop_max):
 
     return drop_item
 
+# return the first GPS timestamp found in the data, or None if none found
+def timestamp_from_data(data, units, on_drop=lambda reason: None):
+    ts = None
+
+    def set_ts(_ts):
+        nonlocal ts
+        ts = _ts.dt
+        #print("Entry:", _ts)
+
+    converter = GPS5EntryConverter(units=units,
+                                   drop_item=gps_filters(on_drop, 6.0),
+                                   on_item=lambda entry: set_ts(entry) )
+
+    visitor = GPSVisitor(converter=converter.convert)
+
+    for i in GPMDParser(data).items():
+        i.accept(visitor)
+        if ts is not None:
+            return ts
+
 
 def timeseries_from_data(data, units, on_drop=lambda reason: None):
     ts = Timeseries()
@@ -479,5 +499,5 @@ def timeseries_from_data(data, units, on_drop=lambda reason: None):
     return ts
 
 
-def timeseries_from(filepath, **kwargs):
-    return timeseries_from_data(load_gpmd_from(filepath), **kwargs)
+def timeseries_from(filepath, track, **kwargs):
+    return timeseries_from_data(load_gpmd_from(filepath, track), **kwargs)
