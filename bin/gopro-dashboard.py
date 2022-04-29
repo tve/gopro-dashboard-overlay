@@ -152,21 +152,22 @@ if __name__ == "__main__":
                     renderer=renderer, timeseries=timeseries, font=font, privacy_zone=privacy_zone)
             )
 
+            if args.profile:
+                ffmpeg_options = load_ffmpeg_profile(ourdir, args.profile)
+            else:
+                ffmpeg_options = None
+ 
             if args.overlay_only:
                 ffmpeg = FFMPEGGenerate(
                     output=args.output,
-                    overlay_size=dimensions
+                    overlay_size=dimensions,
+                    options=ffmpeg_options,
                 )
             else:
                 redirect = None
                 if not args.show_ffmpeg:
                     redirect = temp_file_name()
                     print(f"FFMPEG Output is in {redirect}")
-
-                if args.profile:
-                    ffmpeg_options = load_ffmpeg_profile(ourdir, args.profile)
-                else:
-                    ffmpeg_options = None
 
                 ffmpeg = FFMPEGOverlay(
                     input=input_file,
