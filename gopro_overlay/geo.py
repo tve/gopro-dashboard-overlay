@@ -66,7 +66,7 @@ def dbm_caching_renderer(provider, dbm_file):
 class CachingRenderer:
 
     def __init__(self, style="osm", api_key=None):
-        self.ourdir = Path.home().joinpath(".gopro-graphics")
+        self.ourdir = Path.home().joinpath(".gopro-overlay")
         self.provider = provider_for_style(style, api_key)
 
     @contextlib.contextmanager

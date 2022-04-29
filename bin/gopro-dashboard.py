@@ -29,7 +29,7 @@ from gopro_overlay.privacy import PrivacyZone, NoPrivacyZone
 from gopro_overlay.timing import PoorTimer
 from gopro_overlay.units import units
 
-ourdir = Path.home().joinpath(".gopro-graphics")
+ourdir = Path.home().joinpath(".gopro-overlay")
 
 
 def accepter_from_args(include, exclude):

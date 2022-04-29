@@ -62,13 +62,13 @@ optional arguments:
                         <XxY> e.g. 1920x1080 Force size of overlay. Use if video differs from supported bundled overlay sizes (1920x1080, 3840x2160) (default: None)
   --output-size OUTPUT_SIZE
                         Vertical size of output movie (default: 1080)
-  --profile PROFILE     (EXPERIMENTAL) Use ffmpeg options profile <name> from ~/gopro-graphics/ffmpeg-profiles.json (default: None)
+  --profile PROFILE     (EXPERIMENTAL) Use ffmpeg options profile <name> from ~/gopro-overlay/ffmpeg-profiles.json (default: None)
 ```
 
 
 ## FFMPEG Profiles
 
-Create a file `~/.gopro-graphics/ffmpeg-profiles.json`, and put FFMPEG parameters to control the `input` and `output`
+Create a file `~/.phics/ffmpeg-profiles.json`, and put FFMPEG parameters to control the `input` and `output`
 
 Both `input` and `output` sections are mandatory.
 
