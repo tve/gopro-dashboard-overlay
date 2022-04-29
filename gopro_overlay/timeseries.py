@@ -120,10 +120,10 @@ class Timeseries:
 
     def get(self, dt, interpolate=True):
         self.check_modified()
-        if not self.dates or dt < self.dates[0]:
-            raise ValueError("Date is before start")
-        if dt > self.dates[-1]:
-            raise ValueError("Date is after end")
+        if not self.dates:
+            raise ValueError("Timeseries is empty")
+        if dt < self.dates[0] or dt > self.dates[-1]:
+            return Entry(dt)
         if dt in self.entries:
             return self.entries[dt]
         else:

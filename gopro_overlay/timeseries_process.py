@@ -61,6 +61,8 @@ def calculate_odo():
 
 def calculate_gradient():
     def accept(a, b, c):
+        if a.alt is None or b.alt is None:
+            return {"grad": 0.0}
         gain = b.alt - a.alt
         if a.odo and b.odo:
             dist = b.odo - a.odo
