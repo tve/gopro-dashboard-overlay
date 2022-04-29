@@ -147,7 +147,7 @@ class Timeseries:
         if self.dates[index_min] > dt_min and index_min > 0:
             index_min = index_min - 1
 
-        if self.dates[index_max] < dt_max and index_max < len(self.dates) - 1:
+        if index_max < len(self.dates) - 1 and self.dates[index_max] < dt_max:
             index_max = index_max + 1
 
         dates = self.dates[index_min:index_max + 1]
