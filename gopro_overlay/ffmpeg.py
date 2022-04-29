@@ -134,38 +134,6 @@ def ffmpeg_libx264_is_installed():
     return len(libx264s) > 0
 
 
-class FFMPEGGenerate:
-
-    def __init__(self, output, overlay_size: Dimension, popen=subprocess.Popen):
-        self.output = output
-        self.overlay_size = overlay_size
-        self.popen = popen
-
-    @contextlib.contextmanager
-    def generate(self):
-        cmd = [
-            "ffmpeg",
-            "-y",
-            "-loglevel", "info",
-            "-f", "rawvideo",
-            "-framerate", "10.0",
-            "-s", f"{self.overlay_size.x}x{self.overlay_size.y}",
-            "-pix_fmt", "rgba",
-            "-i", "-",
-            "-r", "30",
-            "-vcodec", "libx264",
-            "-preset", "veryfast",
-            self.output
-        ]
-        process = self.popen(cmd, stdin=subprocess.PIPE, stdout=None, stderr=None)
-        try:
-            yield process.stdin
-        finally:
-            process.stdin.flush()
-        process.stdin.close()
-        process.wait(10)
-
-
 class FFMPEGOptions:
 
     def __init__(self, input=None, output=None):
@@ -192,6 +160,39 @@ def flatten(list_of_lists):
 
     flatten_part(list_of_lists)
     return result
+
+
+class FFMPEGGenerate:
+
+    def __init__(self, output, overlay_size: Dimension, options: FFMPEGOptions = None, popen=subprocess.Popen):
+        self.output = output
+        self.options = options if options else FFMPEGOptions()
+        self.overlay_size = overlay_size
+        self.popen = popen
+
+    @contextlib.contextmanager
+    def generate(self):
+        cmd = flatten([
+            "ffmpeg",
+            "-y",
+            self.options.general,
+            #"-loglevel", "info",
+            "-f", "rawvideo",
+            "-framerate", "10.0",
+            "-s", f"{self.overlay_size.x}x{self.overlay_size.y}",
+            "-pix_fmt", "rgba",
+            "-i", "-",
+            self.options.output,
+            self.output
+        ])
+        print(f"Running FFMPEG as '{' '.join(cmd)}'")
+        process = self.popen(cmd, stdin=subprocess.PIPE, stdout=None, stderr=None)
+        try:
+            yield process.stdin
+        finally:
+            process.stdin.flush()
+        process.stdin.close()
+        process.wait(120)
 
 
 class FFMPEGOverlay:
