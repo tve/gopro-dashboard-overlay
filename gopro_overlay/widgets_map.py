@@ -110,13 +110,13 @@ class JourneyMap:
     def draw(self, image, draw):
         self._init_maybe()
 
-        location = self.location()
-
         frame = self.image.copy()
-
         draw = ImageDraw.Draw(frame)
-        current = self.map.rev_geocode((location.lon, location.lat))
-        draw_marker(draw, current, 6)
+
+        location = self.location()
+        if location:
+            current = self.map.rev_geocode((location.lon, location.lat))
+            draw_marker(draw, current, 6)
 
         image.alpha_composite(frame, self.at.tuple())
 
