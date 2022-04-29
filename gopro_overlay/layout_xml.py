@@ -153,8 +153,12 @@ def metric_accessor_from(name):
         "lat": lambda e: units.Quantity(e.point.lat, units.location),
         "lon": lambda e: units.Quantity(e.point.lon, units.location),
     }
+
     if name in accessors:
-        return accessors[name]
+        def access(e):
+            try: return accessors[name](e)
+            except AttributeError: return None
+        return access
     raise IOError(f"The metric '{name}' is not supported. Use one of: {list(accessors.keys())}")
 
 
