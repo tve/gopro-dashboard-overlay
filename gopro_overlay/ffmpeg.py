@@ -243,7 +243,10 @@ class FFMPEGOverlay:
                 process.stdin.flush()
             process.stdin.close()
             # really long wait as FFMPEG processes all the mpeg input file - not sure how to prevent this atm
-            process.wait(5 * 60)
+            print("Waiting for FFMPEG to finish ", end="")
+            while process.poll() is None:
+                print(".", end="")
+                time.sleep(10)
         except FileNotFoundError:
             raise IOError("Unable to start the 'ffmpeg' process - is FFMPEG installed?") from None
         except BrokenPipeError:
