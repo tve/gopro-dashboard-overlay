@@ -22,7 +22,7 @@ def invoke(cmd, **kwargs):
         raise IOError(f"Error: {cmd}\n stdout: {e.stdout}\n stderr: {e.stderr}")
 
 
-StreamInfo = namedtuple("StreamInfo", ["audio", "video", "meta", "video_dimension"])
+StreamInfo = namedtuple("StreamInfo", ["audio", "video", "meta", "video_dimension", "rate", "duration"])
 
 
 def cut_file(input, output, start, duration):
@@ -75,38 +75,37 @@ def join_files(filepaths, output):
 
 
 def find_streams(filepath, invoke=invoke):
-    print(f"ffprobe --hide_banner {filepath}")
-    ffprobe_output = str(invoke(["ffprobe", "-hide_banner", filepath]).stderr)
-
-    # Stream #0:0[0x1](eng): Video: h264 (High) (avc1 / 0x31637661), yuvj420p(pc, bt709, progressive), 2704x1520 [SAR 1:1 DAR 169:95], 60003 kb/s, 59.94 fps, 59.94 tbr, 60k tbn (default)
-
-    video_re = re.compile(r"Stream #\d+:(\d+)[^:]*: Video.*, (\d+x\d+)")
-    audio_re = re.compile(r"Stream #\d+:(\d+)[^:]*: Audio")
-    meta_re = re.compile(r"Stream #\d+:(\d+)[^:]*: Data: bin_data \(gpmd")
+    cmd = ["ffprobe", "-hide_banner", "-print_format", "json", "-show_streams", filepath]
+    ffprobe_output = str(invoke(cmd).stdout)
+    ffprobe_info = json.loads(ffprobe_output)
+    #print("Loaded: " + ffprobe_output)
 
     video_stream = None
     video_dimension = None
     audio_stream = None
     meta_stream = None
+    rate = None
+    duration = None
 
-    for line in ffprobe_output.split("\n"):
-        video_match = video_re.search(line)
-        if video_match:
-            video_stream = int(video_match.group(1))
-            video_dimension = dimension_from(video_match.group(2))
-        audio_match = audio_re.search(line)
-        if audio_match:
-            audio_stream = int(audio_match.group(1))
-        meta_match = meta_re.search(line)
-        if meta_match:
-            meta_stream = int(meta_match.group(1))
+    for stream in ffprobe_info["streams"]:
+        if stream["codec_type"] == "video":
+            video_stream = stream["index"]
+            video_dimension = Dimension(stream["width"], stream["height"])
+            rate = stream["r_frame_rate"]
+            duration = float(stream["duration"])
+        elif stream["codec_type"] == "audio":
+            audio_stream = stream["index"]
+        elif stream["codec_type"] == "data" and stream.get("codec_name", "") == "bin_data":
+            meta_stream = stream["index"]
 
-    print(f"video: {video_stream} audio: {audio_stream} meta: {meta_stream} video_dimension: {video_dimension}")
+    print(f"video: {video_stream} audio: {audio_stream} meta: {meta_stream}")
+    print(f"video_dimension: {video_dimension} rate: {rate} duration:{duration}s")
 
     if video_stream is None or audio_stream is None or meta_stream is None or video_dimension is None:
         raise IOError("Invalid File? The data stream doesn't seem to contain GoPro audio, video & metadata ")
 
-    return StreamInfo(audio_stream, video_stream, meta_stream, video_dimension)
+    return StreamInfo(audio_stream, video_stream, meta_stream, video_dimension, rate, duration)
+
 
 
 def load_gpmd_from(filepath):
